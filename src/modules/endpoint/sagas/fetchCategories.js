@@ -21,6 +21,9 @@ import htmlparser2 from 'htmlparser2'
 import downloadResources from './downloadResources'
 import getExtension from '../getExtension'
 import request from '../request'
+import Realm from 'realm'
+import { appSchema, tableSchema, Database, Model } from '@nozbe/watermelondb'
+import SQLiteAdapter from '@nozbe/watermelondb/src/adapters/sqlite'
 
 const parseCategories = categories => {
   const urls = new Set<string>()
@@ -47,6 +50,85 @@ const parseCategories = categories => {
   return urls
 }
 
+let realmPromise = null
+
+const testDatabase = async categories => {
+  if (!realmPromise) {
+    realmPromise = Realm.open({
+      schema: [{
+        name: 'Page',
+        properties: {
+          id: 'int',
+          // title: 'string',
+          // content: 'string',
+          // lastUpdate: 'date',
+          // path: 'string',
+          // thumbnail: 'string',
+          // availableLanguages: 'string',
+          // parentPath: 'string',
+          // order: 'int'
+        }
+      }]
+    })
+  }
+
+  await realmPromise.then(realm => {
+    console.time('db')
+    console.log(categories.length)
+    realm.write(() => {
+      categories.forEach(model => realm.create('Page', {id: 5}))
+    })
+    console.timeEnd('db')
+    console.log(realm.objects('Page'))
+  })
+}
+
+class Page extends Model {
+  static table = 'pages'
+}
+
+const schema = appSchema({
+  version: 1,
+  tables: [
+    tableSchema({
+      name: 'pages',
+      columns: [
+        {name: 'a', type: 'number'}
+      ]
+    })
+  ]
+})
+
+const adapter = new SQLiteAdapter({
+  schema
+})
+
+const database = new Database({
+  adapter,
+  modelClasses: [
+    Page
+  ],
+  actionsEnabled: true
+})
+
+const testDatabaseMelon = async categories => {
+  console.time('db')
+  await database.action(async () => {
+    console.time('db')
+    // await database.collections.get('pages').create(page => {
+    //   page.a = 5
+    // })
+    const pages = database.collections.get('pages')
+    console.log(categories.length)
+    await database.batch(
+      ...categories.map(model => pages.prepareCreate(page => {
+        page.a = 5
+      }))
+    )
+    console.timeEnd('db')
+  })
+}
+
 function * fetchCategories (city: string, code: string, urls: Set<string>): Saga<void> {
   const params = {
     city,
@@ -58,6 +140,8 @@ function * fetchCategories (city: string, code: string, urls: Set<string>): Saga
   const categories = categoriesMap.toArray()
 
   parseCategories(categories).forEach(url => urls.add(url))
+
+  yield call(testDatabaseMelon, categories)
 
   const partially: CategoriesFetchPartiallySucceededActionType = {
     type: `CATEGORIES_FETCH_PARTIALLY_SUCCEEDED`,

@@ -3,6 +3,7 @@ package com.integreat;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import io.realm.react.RealmReactPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.reactlibrary.PDFViewPackage;
 import com.dylanvann.fastimage.FastImageViewPackage;
@@ -14,6 +15,7 @@ import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
+import com.nozbe.watermelondb.WatermelonDBPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -30,13 +32,15 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RealmReactPackage(),
             new RNGestureHandlerPackage(),
             new FastImageViewPackage(),
             new RCTMGLPackage(),
             new PDFViewPackage(),
             new RNCWebViewPackage(),
             new RNFetchBlobPackage(),
-            new VectorIconsPackage()
+            new VectorIconsPackage(),
+              new WatermelonDBPackage()
       );
     }
 

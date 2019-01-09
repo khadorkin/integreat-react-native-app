@@ -19,6 +19,12 @@ import {
 import downloadResources from './downloadResources'
 import request from '../request'
 import findResources from '../findResources'
+import SQLite from 'react-native-sqlite-storage'
+
+const db = SQLite.openDatabase({
+  name: 'test.db',
+  location: 'default'
+}, () => console.log('Success'), () => console.log('Failed'))
 
 function * fetchCategories (city: string, code: string, urls: Set<string>): Saga<void> {
   const params = {
@@ -31,6 +37,30 @@ function * fetchCategories (city: string, code: string, urls: Set<string>): Saga
   const categories = categoriesMap.toArray()
 
   findResources(categories).forEach(url => urls.add(url))
+  console.log('insert startA')
+  yield db.transaction(tx => {
+    console.log('insert startB')
+  //  tx.executeSql(```
+  //  CREATE TABLE IF NOT EXISTS categories (
+  //    ID int(11) unsigned NOT NULL auto_increment,
+  //    path varchar(255) NOT NULL
+  //  );
+  //  ```, () => console.log('success'), e => console.log(e))
+
+    const statements = [
+      ['INSERT INTO categories VALUES (\'asdf\');']
+    ]
+
+    for (let i = 0; i < 1000; i++) {
+      statements.push(['INSERT INTO categories VALUES (\'asdf\');'])
+    }
+
+    console.log('insert start')
+
+    tx.sqlBatch(statements)
+
+    console.timeEnd('insert')
+  })
 
   const partially: CategoriesFetchPartiallySucceededActionType = {
     type: `CATEGORIES_FETCH_PARTIALLY_SUCCEEDED`,

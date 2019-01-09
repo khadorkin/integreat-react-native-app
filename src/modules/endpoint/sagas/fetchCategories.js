@@ -24,6 +24,7 @@ import request from '../request'
 import { database } from '../../persistence/database'
 import { TableNames } from '../../persistence/schema'
 import CategoryPersistenceModel from '../../persistence/model/CategoryPersistenceModel'
+import Realm from 'realm'
 
 const parseCategories = categories => {
   const urls = new Set<string>()
@@ -64,6 +65,36 @@ const testDatabaseMelon = async categories => {
   })
 }
 
+let realmPromise = Realm.open({
+  schema: [{
+    name: 'Page',
+    properties: {
+      id: 'int',
+      // title: 'string',
+      // content: 'string',
+      // lastUpdate: 'date',
+      // path: 'string',
+      // thumbnail: 'string',
+      // availableLanguages: 'string',
+      // parentPath: 'string',
+      // order: 'int'
+    }
+  }]
+})
+
+const testDatabaseRealm = async categories => {
+  await realmPromise.then(realm => {
+    console.log(categories.length)
+
+    console.time('db')
+    realm.write(() => {
+      categories.forEach(model => realm.create('Page', {id: 5}))
+    })
+    console.timeEnd('db')
+    console.log(realm.objects('Page'))
+  })
+}
+
 function * fetchCategories (city: string, code: string, urls: Set<string>): Saga<void> {
   const params = {
     city,
@@ -76,7 +107,8 @@ function * fetchCategories (city: string, code: string, urls: Set<string>): Saga
 
   parseCategories(categories).forEach(url => urls.add(url))
 
-  yield call(testDatabaseMelon, categories)
+  yield call(testDatabaseRealm, categories)
+  // yield call(testDatabaseMelon, categories)
 
   const partially: CategoriesFetchPartiallySucceededActionType = {
     type: `CATEGORIES_FETCH_PARTIALLY_SUCCEEDED`,

@@ -51,6 +51,8 @@ target 'Integreat' do
   # react-native-vector-icons
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
   pod 'RNGestureHandler', :path => '../node_modules/react-native-gesture-handler/ios'
+  # SQLite
+  pod 'react-native-sqlite-storage', :path => '../node_modules/react-native-sqlite-storage'
 
   target 'IntegreatTests' do
     inherit! :search_paths

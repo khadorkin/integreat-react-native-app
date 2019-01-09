@@ -42,6 +42,7 @@
     "react-native-progress": "^3.5.0",
     "react-native-render-html": "^3.10.0",
     "react-native-screens": "^1.0.0-alpha.17",
+    "react-native-sqlite-storage": "^3.3.9",
     "react-native-vector-icons": "^6.1.0",
     "react-native-view-pdf": "^0.4.1",
     "react-native-webview": "^2.14.0",
@@ -56,6 +57,7 @@
     "redux-saga": "^0.16.2",
     "reselect": "^4.0.0",
     "rn-fetch-blob": "^0.10.13",
+    "sql-bricks": "^2.0.4",
     "styled-components": "^4.1.1"
   },
   "devDependencies": {

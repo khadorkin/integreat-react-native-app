@@ -85,5 +85,8 @@ suppress_comment=\\(.\\|\n\\)*\\$FlowExpectedError
 
 esproposal.optional_chaining=enable
 
+# See https://github.com/Nozbe/WatermelonDB/blob/master/docs/Advanced/Flow.md
+module.name_mapper='^@nozbe/watermelondb\(.*\)$' -> '<PROJECT_ROOT>/node_modules/@nozbe/watermelondb/src\1'
+
 [version]
 ^0.86.0

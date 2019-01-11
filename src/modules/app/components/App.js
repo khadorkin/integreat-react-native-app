@@ -13,6 +13,10 @@ import type { StateType } from '../StateType'
 import type { StoreActionType } from '../StoreActionType'
 import Navigator from './Navigator'
 
+if (global && !global.self) {
+  global.self = global
+}
+
 class App extends React.Component<{}, { waitingForStore: boolean }> {
   store: Store<StateType, StoreActionType>
 

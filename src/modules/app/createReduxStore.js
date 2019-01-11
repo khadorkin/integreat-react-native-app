@@ -30,6 +30,7 @@ import citiesReducer from '../endpoint/reducers/cititesReducer'
 import languagesReducer from '../endpoint/reducers/languagesReducer'
 import currentCityReducer from '../categories/reducers/currentCityReducer'
 import { composeWithDevTools } from 'redux-devtools-extension'
+import logger from 'redux-logger'
 
 function * rootSaga (): Saga<void> {
   yield all([

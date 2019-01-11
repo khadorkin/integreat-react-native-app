@@ -162,7 +162,7 @@ dependencies {
                 force = true
             }
     }
-    compile project(':watermelondb')  // ⬅️ This!
+//    compile project(':watermelondb')  // ⬅️ This!
     implementation project(':react-native-view-pdf')
     implementation project(':react-native-webview')
     implementation project(':rn-fetch-blob')

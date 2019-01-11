@@ -21,9 +21,10 @@ import htmlparser2 from 'htmlparser2'
 import downloadResources from './downloadResources'
 import getExtension from '../getExtension'
 import request from '../request'
-import { database } from '../../persistence/database'
-import { TableNames } from '../../persistence/schema'
-import CategoryPersistenceModel from '../../persistence/model/CategoryPersistenceModel'
+// import { database } from '../../persistence/database'
+// import { TableNames } from '../../persistence/schema'
+// import CategoryPersistenceModel from '../../persistence/model/CategoryPersistenceModel'
+self = {fetch: () => {}}
 import Realm from 'realm'
 
 const parseCategories = categories => {
@@ -51,19 +52,19 @@ const parseCategories = categories => {
   return urls
 }
 
-const testDatabaseMelon = async categories => {
-  await database.action(async () => {
-    console.time('db')
-    const categoriesCollection = database.collections.get(TableNames.category)
-
-    const preparedStatement = categories.map(model => categoriesCollection
-      .prepareCreate((page: CategoryPersistenceModel) => {
-        page.populate(model)
-      }))
-    await database.batch(...preparedStatement)
-    console.timeEnd('db')
-  })
-}
+// const testDatabaseMelon = async categories => {
+//   await database.action(async () => {
+//     console.time('db')
+//     const categoriesCollection = database.collections.get(TableNames.category)
+//
+//     const preparedStatement = categories.map(model => categoriesCollection
+//       .prepareCreate((page: CategoryPersistenceModel) => {
+//         page.populate(model)
+//       }))
+//     await database.batch(...preparedStatement)
+//     console.timeEnd('db')
+//   })
+// }
 
 let realmPromise = Realm.open({
   schema: [{
@@ -83,14 +84,30 @@ let realmPromise = Realm.open({
 })
 
 const testDatabaseRealm = async categories => {
+  console.log(`testDatabaseRealm`)
   await realmPromise.then(realm => {
     console.log(categories.length)
 
-    console.time('db')
+    // categories.forEach(model => {
+    //   realm.write(() => {
+    //     realm.create('Page', {id: 5})
+    //   })
+    // })
+
+    // const t0 = performance.now()
+    console.time('realm insert')
+
+    const start = new Date().getTime()
+
     realm.write(() => {
       categories.forEach(model => realm.create('Page', {id: 5}))
     })
-    console.timeEnd('db')
+    // console.timeEnd('realm insert')
+    const end = new Date().getTime()
+    const time = end - start
+    alert(`Execution time: ${time}`)
+    // const t1 = performance.now()
+    // console.log(`Call to realm took ${  t1 - t0  } milliseconds.`)
     console.log(realm.objects('Page'))
   })
 }
@@ -149,12 +166,14 @@ function * fetchLanguageCodes (city: string): Saga<Array<string>> {
     return codes
   } catch (e) {
     const failed: LanguagesFetchFailedActionType = {type: `LANGUAGES_FETCH_FAILED`, city, message: e.message}
+    console.trace(e)
     yield put(failed)
+    console.log(`Erro58:${e.message}`)
     throw e
   }
 }
 
-function * fetch (action: FetchCategoriesRequestActionType): Saga<void> {
+function * fetcha (action: FetchCategoriesRequestActionType): Saga<void> {
   const city: string = action.params.city
 
   try {
@@ -168,10 +187,12 @@ function * fetch (action: FetchCategoriesRequestActionType): Saga<void> {
     yield call(downloadResources, city, Array.from(urls))
   } catch (e) {
     const failed: CategoriesFetchFailedActionType = {type: `CATEGORIES_FETCH_FAILED`, city, message: e.message}
+    console.trace(e)
+    console.log(`Erro58:${e.message}`)
     yield put(failed)
   }
 }
 
 export default function * fetchSaga (): Saga<void> {
-  yield takeLatest(`FETCH_CATEGORIES_REQUEST`, fetch)
+  yield takeLatest(`FETCH_CATEGORIES_REQUEST`, fetcha)
 }

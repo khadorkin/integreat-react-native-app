@@ -41,31 +41,38 @@ class Category {
 
 const databaseConnection = createConnection({
   type: 'react-native',
+  database: 'test',
   location: 'default',
-  database: 'test.db',
+  // logging: ['error', 'query', 'schema'],
+  synchronize: true,
   entities: [
     Category
-  ],
-  synchronize: true
+  ]
 })
 
 const testDatabaseTypeORM = async categories => {
   const con = await databaseConnection
+  const models = []
 
-  const models = categories.map(category => {
-    const model = new Category()
-    model.path = category.path
-    model.thumbnail = category.thumbnail
-    model.parentPath = category.parentPath
-    model.order = category.order
-    return model
-  })
+  for (let i = 0; i < 100; i++) {
+    models.push(...categories.map(category => {
+      const model = new Category()
+      model.path = category.path
+      model.thumbnail = category.thumbnail
+      model.parentPath = category.parentPath
+      model.order = category.order
+      return model
+    }))
+  }
+
   const repository = con.getRepository(Category)
 
   let start = new Date().getTime()
+  // console.time('typeorm insert')
   await repository.save(models)
   let end = new Date().getTime()
   console.log(`Inserted ${models.length} objects in ${end - start}`)
+  // console.timeEnd('typeorm insert')
 
   start = new Date().getTime()
   const allPages = await repository.find()
@@ -100,14 +107,15 @@ function * fetchAllCategories (city: string, codes: Array<string>, prioritised: 
   const urls = new Set<string>()
 
   if (codes.includes(prioritised)) {
-    yield fork(fetchCategories, city, prioritised, urls)
+    yield call(fetchCategories, city, prioritised, urls)
+    yield call(fetchCategories, city, prioritised, urls)
   }
 
-  const otherCodes = codes.filter(value => value !== prioritised)
-
-  for (const code: string of otherCodes) {
-    yield fork(fetchCategories, city, code, urls)
-  }
+  // const otherCodes = codes.filter(value => value !== prioritised)
+  //
+  // for (const code: string of otherCodes) {
+  //   yield fork(fetchCategories, city, code, urls)
+  // }
 
   return urls
 }

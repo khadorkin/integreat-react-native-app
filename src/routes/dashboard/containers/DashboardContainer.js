@@ -61,6 +61,10 @@ const mapStateToProps = (state: StateType, ownProps) => {
     return notReadyProps
   }
 
+  if (!categories.json) {
+    return notReadyProps
+  }
+
   const json = categories.json[language]
 
   if (!json) {

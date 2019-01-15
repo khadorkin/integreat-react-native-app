@@ -37,29 +37,43 @@ function * fetchCategories (city: string, code: string, urls: Set<string>): Saga
   const categories = categoriesMap.toArray()
 
   findResources(categories).forEach(url => urls.add(url))
-  console.log('insert startA')
-  yield db.transaction(tx => {
-    console.log('insert startB')
-  //  tx.executeSql(```
-  //  CREATE TABLE IF NOT EXISTS categories (
-  //    ID int(11) unsigned NOT NULL auto_increment,
-  //    path varchar(255) NOT NULL
-  //  );
-  //  ```, () => console.log('success'), e => console.log(e))
+  // console.log('insert startA')
+  // yield db.transaction(tx => {
+  //   console.log('insert startB')
+  db.executeSql('CREATE TABLE IF NOT EXISTS categories (ID INTEGER PRIMARY KEY AUTOINCREMENT, a varchar(50) NOT NULL, b varchar(50) NOT NULL, c varchar(50) NOT NULL, d varchar(50) NOT NULL, e varchar(50) NOT NULL, f varchar(50) NOT NULL, g varchar(50) NOT NULL);', [], () => {
+    console.log('created table')
 
     const statements = [
       ['INSERT INTO categories VALUES (\'asdf\');']
     ]
 
     for (let i = 0; i < 1000; i++) {
-      statements.push(['INSERT INTO categories VALUES (\'asdf\');'])
+      // statements.push(['INSERT INTO categories VALUES (\'asdf\', \'asdf\', \'asdf\', \'asdf\', \'asdf\', \'asdf\', \'asdf\');'])
+
+      db.sqlBatch(statements, (succ: any) => { // 795.621826171875ms
+        console.log(succ)
+        console.log('insert end')
+        console.timeEnd('raw insert')
+      }, (err: any) => {
+        console.log(err)
+        console.log('insert err')
+        console.timeEnd('raw insert')
+      })
     }
 
     console.log('insert start')
 
-    tx.sqlBatch(statements)
+    console.time('raw insert')
 
-    console.timeEnd('insert')
+    db.sqlBatch(statements, (succ: any) => { // 795.621826171875ms
+      console.log(succ)
+      console.log('insert end')
+      console.timeEnd('raw insert')
+    }, (err: any) => {
+      console.log(err)
+      console.log('insert err')
+      console.timeEnd('raw insert')
+    })
   })
 
   const partially: CategoriesFetchPartiallySucceededActionType = {
@@ -78,11 +92,11 @@ function * fetchAllCategories (city: string, codes: Array<string>, prioritised: 
     yield fork(fetchCategories, city, prioritised, urls)
   }
 
-  const otherCodes = codes.filter(value => value !== prioritised)
-
-  for (const code: string of otherCodes) {
-    yield fork(fetchCategories, city, code, urls)
-  }
+  // const otherCodes = codes.filter(value => value !== prioritised)
+  //
+  // for (const code: string of otherCodes) {
+  //   yield fork(fetchCategories, city, code, urls)
+  // }
 
   return urls
 }

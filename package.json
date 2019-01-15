@@ -42,6 +42,7 @@
     "react-native-progress": "^3.5.0",
     "react-native-render-html": "^3.10.0",
     "react-native-screens": "^1.0.0-alpha.17",
+    "react-native-sqlite-storage": "^3.3.9",
     "react-native-vector-icons": "^6.1.0",
     "react-native-view-pdf": "^0.4.1",
     "react-native-webview": "^2.14.0",
@@ -54,12 +55,15 @@
     "redux-logger": "^3.0.6",
     "redux-persist": "^5.10.0",
     "redux-saga": "^0.16.2",
+    "reflect-metadata": "^0.1.12",
     "reselect": "^4.0.0",
     "rn-fetch-blob": "^0.10.13",
-    "styled-components": "^4.1.1"
+    "styled-components": "^4.1.1",
+    "typeorm": "^0.2.11"
   },
   "devDependencies": {
     "@babel/core": "^7.1.6",
+    "@babel/plugin-proposal-decorators": "^7.2.3",
     "@babel/preset-flow": "^7.0.0",
     "@integreat-app/eslint-config": "^0.2.1",
     "@integreat-app/eslint-config-jest": "^0.2.1",

@@ -15,17 +15,18 @@ import {
   categoriesEndpoint,
   languagesEndpoint,
   LanguageModel,
-  CategoriesMapModel, CategoryModel
+  CategoriesMapModel
 } from '@integreat-app/integreat-api-client'
 import downloadResources from './downloadResources'
 import request from '../request'
-import getExtension from '../getExtension'
-import htmlparser2 from 'htmlparser2'
-import { Column, createConnection, Entity, PrimaryColumn } from 'typeorm/browser'
+import { Column, createConnection, Entity, PrimaryGeneratedColumn } from 'typeorm/browser'
 
 @Entity()
 class Category {
-  @PrimaryColumn('varchar', {length: 200})
+  @PrimaryGeneratedColumn('increment')
+  id: number
+
+  @Column('varchar', {length: 200})
   path: string
 
   @Column('varchar', {length: 200, nullable: true})
@@ -36,31 +37,6 @@ class Category {
 
   @Column('int')
   order: number
-}
-
-const parseCategories = categories => {
-  const urls = new Set<string>()
-
-  const onattribute = (name: string, value: string) => {
-    if (name === 'href' || name === 'src') {
-      if (['png', 'jpg', 'jpeg', 'pdf'].includes(getExtension(value))) {
-        urls.add(value)
-      }
-    }
-  }
-
-  const parser = new htmlparser2.Parser({onattribute}, {decodeEntities: true})
-
-  for (const category: CategoryModel of categories) {
-    parser.write(category.content)
-
-    if (category.thumbnail) {
-      urls.add(category.thumbnail)
-    }
-  }
-
-  parser.end()
-  return urls
 }
 
 const databaseConnection = createConnection({
@@ -74,32 +50,27 @@ const databaseConnection = createConnection({
 })
 
 const testDatabaseTypeORM = async categories => {
-  console.log(`test typeORM`)
-  databaseConnection.then(async connection => {
-    const models = categories.map(category => {
-      const model = new Category()
-      model.path = category.path
-      model.thumbnail = category.thumbnail
-      model.parentPath = category.parentPath
-      model.order = category.order
-      return model
-    })
-    const repository = connection.getRepository(Category)
+  const con = await databaseConnection
 
-    console.log(`Inserting ${models.length} objects.`)
-    const now = new Date().getTime()
-    await repository.save(models)
-    const fin = new Date().getTime()
-    console.log(`Inserting took ${fin - now}.`)
+  const models = categories.map(category => {
+    const model = new Category()
+    model.path = category.path
+    model.thumbnail = category.thumbnail
+    model.parentPath = category.parentPath
+    model.order = category.order
+    return model
+  })
+  const repository = con.getRepository(Category)
 
-    console.log('Loading all objects.')
-    const start = new Date().getTime()
-    const allPages = await repository.find()
-    const end = new Date().getTime()
-    console.log(allPages)
-    console.log(`Loaded all objects in ${end - start}.`)
+  let start = new Date().getTime()
+  await repository.save(models)
+  let end = new Date().getTime()
+  console.log(`Inserted ${models.length} objects in ${end - start}`)
 
-  }).catch(error => console.log(error))
+  start = new Date().getTime()
+  const allPages = await repository.find()
+  end = new Date().getTime()
+  console.log(`Loaded ${allPages.length} objects in ${end - start}.`)
 }
 
 function * fetchCategories (city: string, code: string, urls: Set<string>): Saga<void> {

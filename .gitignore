@@ -228,3 +228,7 @@ fabric.properties
 # OSM map files
 *.mbtiles
 
+
+# Haul
+#
+haul-debug.log

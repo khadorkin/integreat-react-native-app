@@ -17,7 +17,8 @@
     "lint": "eslint .",
     "flow:check-now": "flow check",
     "flow:install-types": "flow-typed install --ignoreDeps dev",
-    "proxy": "node tools/metro-proxy.js"
+    "proxy": "node tools/metro-proxy.js",
+    " ": "haul"
   },
   "dependencies": {
     "@integreat-app/integreat-api-client": "^1.0.5",
@@ -84,12 +85,15 @@
     "flow-typed": "^2.5.1",
     "generator-rn-toolbox": "^3.4.1",
     "get-dev-paths": "^0.1.0",
+    "haul": "^1.0.0-rc.10",
     "http-proxy": "^1.17.0",
     "jest": "^23.6.0",
     "jest-fetch-mock": "^2.0.0",
     "jest-react-native": "^18.0.0",
     "lolex": "^3.0.0",
-    "metro-react-native-babel-preset": "^0.49.2",
+    "metro-react-native-babel-preset": "^0.45.6",
+    "react-dom": "^16.7.0",
+    "react-hot-loader": "^4.6.3",
     "react-native-git-upgrade": "^0.2.7",
     "react-test-renderer": "16.6.1",
     "redux-devtools-extension": "^2.13.6",
